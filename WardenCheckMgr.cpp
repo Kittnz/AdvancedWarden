@@ -97,12 +97,12 @@ void WardenCheckMgr::LoadWardenChecks()
             }
         }
 
-        if (checkType == MEM_CHECK || checkType == MODULE_CHECK)
+        if (checkType == MEM_CHECK || checkType == MODULE_CHECK) // MEM2 is in the other list (OtherChecksIdPool)
             MemChecksIdPool.push_back(id);
         else
             OtherChecksIdPool.push_back(id);
 
-        if (checkType == MEM_CHECK || checkType == PAGE_CHECK_A || checkType == PAGE_CHECK_B || checkType == PROC_CHECK)
+        if (checkType == MEM_CHECK || checkType == MEM2_CHECK || checkType == PAGE_CHECK_A || checkType == PAGE_CHECK_B || checkType == PROC_CHECK)
         {
             wardenCheck->Address = address;
             wardenCheck->Length = length;
@@ -114,7 +114,7 @@ void WardenCheckMgr::LoadWardenChecks()
 
         CheckStore[id] = wardenCheck;
 
-        if (checkType == MPQ_CHECK || checkType == MEM_CHECK)
+        if (checkType == MPQ_CHECK || checkType == MEM_CHECK || checkType == MEM2_CHECK)
         {
             WardenCheckResult* wr = new WardenCheckResult();
             wr->Result.SetHexStr(checkResult.c_str());
