@@ -166,7 +166,8 @@ void WardenWin::HandleHashResult(ByteBuffer &buff)
 
 	_initialized = true;
 
-	_previousTimestamp = GameTime::GetGameTimeMS();
+	//_previousTimestamp = GameTime::GetGameTimeMS();
+	_previousTimestamp = getMSTime();
 }
 
 void WardenWin::RequestData()
@@ -303,7 +304,8 @@ void WardenWin::RequestData()
 		}
 		case MODULE_CHECK:
 		{
-			uint32 seed = rand32();
+			//uint32 seed = rand32();
+			uint32 seed = static_cast<uint32>(rand32());
 			buff << uint32(seed);
 			HmacHash hmac(4, (uint8*)&seed);
 			hmac.UpdateData(wd->Str);
@@ -328,7 +330,8 @@ void WardenWin::RequestData()
 	buff.hexlike();
 
 	// Encrypt with warden RC4 key
-	EncryptData(buff.contents(), buff.size());
+	//EncryptData(buff.contents(), buff.size());
+	EncryptData(const_cast<uint8*>(buff.contents()), buff.size());
 
 	WorldPacket pkt(SMSG_WARDEN_DATA, buff.size());
 	pkt.append(buff);
@@ -378,7 +381,8 @@ void WardenWin::HandleData(ByteBuffer &buff)
 		uint32 newClientTicks;
 		buff >> newClientTicks;
 
-		uint32 ticksNow = GameTime::GetGameTimeMS();
+		//uint32 ticksNow = GameTime::GetGameTimeMS();
+		uint32 ticksNow = getMSTime();
 		uint32 ourTicks = newClientTicks + (ticksNow - _serverTicks);
 
 		TC_LOG_DEBUG("warden", "ServerTicks %u", ticksNow);         // Now
@@ -407,7 +411,7 @@ void WardenWin::HandleData(ByteBuffer &buff)
 		{
 		case MEM_CHECK:
 		{
-//			const uint16 equalZero = 0x0000;
+			const uint16 equalZero = 0x0000;
 			uint8 Mem_Result;
 			buff >> Mem_Result;
 
@@ -458,16 +462,16 @@ void WardenWin::HandleData(ByteBuffer &buff)
 				continue;	// We have to do the GAGARIN_CHECK_ID check once or (GAGARIN_CHECK_ID-1) cant ever be check in case warden checks multiple MEM_CHECK each packet
 			}
 		}
-	 if (rd->CheckId == GAGARIN_CHECK_ID - 1)
-	{
+		if (rd->CheckId == GAGARIN_CHECK_ID - 1)
+		{
 
-		if (_session->GetHoffset() == 0 || justCheck)
-			buff.rpos(buff.rpos() + rd->Length);
-		continue;	// In case the check (GAGARIN_CHECK_ID-1) is called before the GAGARIN_CHECK_ID one for some reason OR we did GAGARIN_CHECK_ID in same packet (<=> bug)
+			if (_session->GetHoffset() == 0 || justCheck)
+				buff.rpos(buff.rpos() + rd->Length);
+			continue;	// In case the check (GAGARIN_CHECK_ID-1) is called before the GAGARIN_CHECK_ID one for some reason OR we did GAGARIN_CHECK_ID in same packet (<=> bug)
 
-		TC_LOG_DEBUG("warden", "RESULT MEM_CHECK passed CheckId %u account Id %u", *itr, _session->GetAccountId());
-		break;
-	}
+			TC_LOG_DEBUG("warden", "RESULT MEM_CHECK passed CheckId %u account Id %u", *itr, _session->GetAccountId());
+			break;
+		}
 		case MEM2_CHECK:
 		{
 			uint8 Mem_Result;
