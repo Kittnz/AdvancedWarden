@@ -1,2 +1,2 @@
 # AdvancedWarden
-A kick ass collab for the most epic anti cheat ever!
+Advanced Warden to detect SSNS/Thread Hook Injections
